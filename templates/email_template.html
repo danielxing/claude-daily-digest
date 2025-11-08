@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Daily Digest</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #191919 0%, #2d2d2d 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            color: #cccccc;
+            font-size: 14px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #191919;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        .item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #191919;
+        }
+        .item h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #191919;
+        }
+        .item h3 a {
+            color: #191919;
+            text-decoration: none;
+        }
+        .item h3 a:hover {
+            color: #444444;
+            text-decoration: underline;
+        }
+        .item-meta {
+            font-size: 13px;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+        .item-meta .source {
+            background-color: #e5e5e5;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        .item-meta .stars {
+            color: #f59e0b;
+            margin-right: 5px;
+        }
+        .item p {
+            margin: 10px 0 0 0;
+            color: #444444;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .read-more {
+            display: inline-block;
+            margin-top: 10px;
+            color: #191919;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .read-more:hover {
+            text-decoration: underline;
+        }
+        .no-content {
+            text-align: center;
+            padding: 40px;
+            color: #666666;
+            font-style: italic;
+        }
+        .stats {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #191919;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666666;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .footer {
+            background-color: #191919;
+            padding: 30px;
+            text-align: center;
+            color: #cccccc;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📰 Claude Daily Digest</h1>
+            <p>{{ date }}</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats -->
+            <div class="stats">
+                <div style="font-size: 16px; font-weight: 600; color: #191919;">今日汇总</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ official_updates|length }}</div>
+                        <div class="stat-label">官方更新</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ github_projects|length }}</div>
+                        <div class="stat-label">GitHub项目</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ blog_posts|length }}</div>
+                        <div class="stat-label">技术文章</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Official Updates -->
+            {% if official_updates %}
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📢</span>
+                    官方更新
+                </h2>
+                {% for item in official_updates[:5] %}
+                <div class="item">
+                    <h3><a href="{{ item.url }}" target="_blank">{{ item.title }}</a></h3>
+                    <div class="item-meta">
+                        <span class="source">{{ item.source }}</span>
+                        {% if item.published %}
+                        <span>{{ item.published }}</span>
+                        {% endif %}
+                    </div>
+                    {% if item.summary %}
+                    <p>{{ item.summary }}</p>
+                    {% endif %}
+                    <a href="{{ item.url }}" class="read-more" target="_blank">阅读全文 →</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- GitHub Projects -->
+            {% if github_projects %}
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    精选项目
+                </h2>
+                {% for item in github_projects[:10] %}
+                <div class="item">
+                    <h3><a href="{{ item.url }}" target="_blank">{{ item.title }}</a></h3>
+                    <div class="item-meta">
+                        <span class="source">{{ item.source }}</span>
+                        {% if item.stars %}
+                        <span class="stars">⭐</span><span>{{ item.stars }} stars</span>
+                        {% endif %}
+                        {% if item.language %}
+                        <span style="margin-left: 10px;">💻 {{ item.language }}</span>
+                        {% endif %}
+                    </div>
+                    {% if item.description %}
+                    <p>{{ item.description }}</p>
+                    {% endif %}
+                    <a href="{{ item.url }}" class="read-more" target="_blank">查看项目 →</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Blog Posts -->
+            {% if blog_posts %}
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    深度文章
+                </h2>
+                {% for item in blog_posts[:10] %}
+                <div class="item">
+                    <h3><a href="{{ item.url }}" target="_blank">{{ item.title }}</a></h3>
+                    <div class="item-meta">
+                        <span class="source">{{ item.source }}</span>
+                        {% if item.published %}
+                        <span>{{ item.published }}</span>
+                        {% endif %}
+                    </div>
+                    {% if item.summary %}
+                    <p>{{ item.summary }}</p>
+                    {% endif %}
+                    <a href="{{ item.url }}" class="read-more" target="_blank">阅读全文 →</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- No Content -->
+            {% if not official_updates and not github_projects and not blog_posts %}
+            <div class="no-content">
+                <p>今天暂无新内容</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Automated digest powered by GitHub Actions</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/your-username/claude-daily-digest">View on GitHub</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

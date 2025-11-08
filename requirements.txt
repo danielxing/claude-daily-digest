@@ -1,0 +1,18 @@
+# Web scraping and data collection
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+feedparser>=6.0.10
+lxml>=4.9.0
+
+# GitHub API
+PyGithub>=2.1.1
+
+# Email sending
+jinja2>=3.1.2
+
+# Data storage
+tinydb>=4.8.0
+
+# Utilities
+python-dateutil>=2.8.2
+pytz>=2023.3
