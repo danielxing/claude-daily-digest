@@ -123,7 +123,7 @@ def save_html_preview(html_content):
 
 
 def main():
-    """Main email sending function"""
+    """Main email HTML generation function"""
     logger.info("=" * 60)
     logger.info("Starting email digest generation")
     logger.info("=" * 60)
@@ -135,33 +135,20 @@ def main():
     total_items = digest_data.get('total_items', 0)
     logger.info(f"   Total items: {total_items}")
 
-    # Check if there's content to send
-    if total_items == 0:
-        logger.warning("\n⚠ No new content to send today")
-        logger.info("Skipping email send")
-        sys.exit(0)
-
-    # Render HTML
+    # Render HTML (even if no content, for testing)
     logger.info("\n2. Rendering email HTML...")
     html_content = render_email_html(digest_data)
 
-    # Save preview (useful for debugging)
+    # Save preview (this will be used by GitHub Actions to send email)
     save_html_preview(html_content)
 
-    # Send email
-    logger.info("\n3. Sending email...")
-    success = send_email(html_content, digest_data)
+    logger.info("\n" + "=" * 60)
+    logger.info("Email HTML generated successfully!")
+    logger.info(f"Total items: {total_items}")
+    logger.info("=" * 60)
 
-    if success:
-        logger.info("\n" + "=" * 60)
-        logger.info("Email sent successfully!")
-        logger.info("=" * 60)
-        sys.exit(0)
-    else:
-        logger.error("\n" + "=" * 60)
-        logger.error("Failed to send email")
-        logger.error("=" * 60)
-        sys.exit(1)
+    # Exit with success
+    sys.exit(0)
 
 
 if __name__ == '__main__':

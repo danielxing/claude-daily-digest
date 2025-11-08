@@ -43,9 +43,9 @@
 
 | Secret名称 | 说明 | 获取方式 |
 |-----------|------|---------|
-| `GMAIL_USER` | 你的Gmail地址 | 例: your-email@gmail.com |
-| `GMAIL_APP_PASSWORD` | Gmail应用专用密码 | [获取方式](#如何获取gmail应用密码) |
-| `RECIPIENT_EMAIL` | 接收邮件的地址 | 可以与GMAIL_USER相同 |
+| `EMAIL_USERNAME` | 你的Gmail地址 | 例: your-email@gmail.com |
+| `EMAIL_PASSWORD` | Gmail应用专用密码 | [获取方式](#如何获取gmail应用密码) |
+| `EMAIL_TO` | 接收邮件的地址 | 可以与EMAIL_USERNAME相同 |
 
 #### 可选的Secrets:
 
@@ -77,7 +77,7 @@
    - 复制生成的16位密码
 
 3. **添加到GitHub Secrets**
-   - 将16位密码添加为 `GMAIL_APP_PASSWORD`
+   - 将16位密码添加为 `EMAIL_PASSWORD`
    - 不要添加空格
 
 ## ⏰ 运行时间
@@ -109,9 +109,9 @@ pip install -r requirements.txt
 ### 设置环境变量
 
 ```bash
-export GMAIL_USER="your-email@gmail.com"
-export GMAIL_APP_PASSWORD="your-app-password"
-export RECIPIENT_EMAIL="recipient@example.com"
+export EMAIL_USERNAME="your-email@gmail.com"
+export EMAIL_PASSWORD="your-app-password"
+export EMAIL_TO="recipient@example.com"
 export GITHUB_TOKEN="your-github-token"  # 可选
 ```
 
@@ -221,7 +221,7 @@ claude-daily-digest/
 
 ### 多收件人
 
-在GitHub Secrets中将 `RECIPIENT_EMAIL` 设置为逗号分隔的邮件地址:
+在GitHub Secrets中将 `EMAIL_TO` 设置为逗号分隔的邮件地址:
 
 ```
 email1@example.com,email2@example.com,email3@example.com

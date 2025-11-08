@@ -1,39 +1,39 @@
 name: Claude Daily Digest
 
 on:
+  # Run daily at noon Shanghai time (04:00 UTC = 12:00 CST/UTC+8)
   schedule:
-    # Run every day at 04:00 UTC (12:00 PM Beijing time)
     - cron: '0 4 * * *'
 
   # Allow manual triggering
   workflow_dispatch:
 
+  # Run on push to main (for testing)
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
 jobs:
   collect-and-send:
     runs-on: ubuntu-latest
+    outputs:
+      date: ${{ steps.date.outputs.date }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history for proper git operations
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run data collection
@@ -42,29 +42,65 @@ jobs:
         run: |
           python scripts/collect_data.py
 
-      - name: Send email digest
-        env:
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Verify digest data exists and has content
+        run: |
+          if [ ! -f "data/daily_digest.json" ]; then
+            echo "❌ Digest data file not found!"
+            exit 1
+          fi
+          FILE_SIZE=$(wc -c < "data/daily_digest.json")
+          echo "✅ Digest data verified - $FILE_SIZE bytes"
+
+      - name: Generate email HTML
         run: |
           python scripts/send_email.py
 
+      - name: Verify email HTML exists
+        run: |
+          if [ ! -f "data/email_preview.html" ]; then
+            echo "❌ Email HTML not found!"
+            exit 1
+          fi
+          FILE_SIZE=$(wc -c < "data/email_preview.html")
+          echo "✅ Email HTML verified - $FILE_SIZE bytes"
+
+      - name: Send email digest
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "📰 Claude Daily Digest - ${{ steps.date.outputs.date }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: "Claude Digest Bot <${{ secrets.EMAIL_USERNAME }}>"
+          html_body: file://data/email_preview.html
+          content_type: text/html
+
       - name: Commit and push database updates
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add data/
-          git diff --quiet && git diff --staged --quiet || (
-            git commit -m "Update content database [skip ci]" &&
-            git push
-          )
+          git diff --quiet && git diff --staged --quiet || (git commit -m "📰 Update content database - ${{ steps.date.outputs.date }}" && git push)
+
+      - name: Upload digest as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ steps.date.outputs.date }}
+          path: data/email_preview.html
+          retention-days: 30
 
       - name: Upload artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: debug-logs
+          name: debug-logs-${{ steps.date.outputs.date }}
           path: |
             data/
             *.log
