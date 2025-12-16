@@ -20,6 +20,3 @@ tinydb>=4.8.0
 # Utilities
 python-dateutil>=2.8.2
 pytz>=2023.3
-
-# Content extraction
-trafilatura>=1.6.0
