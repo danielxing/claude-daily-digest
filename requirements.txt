@@ -7,6 +7,10 @@ lxml>=4.9.0
 # GitHub API
 PyGithub>=2.1.1
 
+# Reddit API (for r/ClaudeAI and other subreddits)
+# Note: Requires REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET environment variables
+# Create app at: https://www.reddit.com/prefs/apps
+
 # Email sending
 jinja2>=3.1.2
 

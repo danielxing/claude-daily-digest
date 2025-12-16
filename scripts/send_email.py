@@ -49,12 +49,14 @@ def render_email_html(digest_data):
 
     template = Template(template_content)
 
-    # Prepare template data
+    # Prepare template data with new structure
     template_data = {
-        'date': datetime.now().strftime('%Y年%m月%d日'),
-        'official_updates': digest_data.get('official_updates', []),
-        'github_projects': digest_data.get('github_projects', []),
-        'blog_posts': digest_data.get('blog_posts', []),
+        'date': datetime.now().strftime('%Y-%m-%d'),
+        # Featured item (Editor's Pick)
+        'featured_item': digest_data.get('featured_item'),
+        # All items list
+        'items': digest_data.get('items', []),
+        # Total
         'total_items': digest_data.get('total_items', 0),
     }
 

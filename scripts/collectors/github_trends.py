@@ -28,10 +28,17 @@ def collect_github_projects():
         g = Github(github_token)
 
         # Search for Claude-related repositories
+        # Balance between Claude API and Claude Code (1:1 ratio)
         search_queries = [
+            # Claude API related
             'claude anthropic',
-            'claude ai',
+            'claude api',
+            'anthropic sdk',
+            # Claude Code related
             'claude-code',
+            'claude code cli',
+            'mcp server anthropic',
+            'model context protocol',
         ]
 
         seen_repos = set()
@@ -66,7 +73,8 @@ def collect_github_projects():
                         'language': repo.language,
                         'updated': repo.updated_at.isoformat(),
                         'source': 'GitHub',
-                        'category': 'github_projects'
+                        'category': 'github_projects',
+                        'owner_avatar': repo.owner.avatar_url if repo.owner else None
                     })
 
         # Sort by stars
@@ -97,10 +105,18 @@ def collect_recent_releases():
         g = Github(github_token)
 
         # Important repos to monitor
+        # Balance between Claude API and Claude Code
         important_repos = [
+            # Claude API / SDK
             'anthropics/anthropic-sdk-python',
             'anthropics/anthropic-sdk-typescript',
+            'anthropics/anthropic-cookbook',
             'anthropics/courses',
+            # Claude Code related
+            'anthropics/claude-code',
+            'modelcontextprotocol/servers',
+            'modelcontextprotocol/typescript-sdk',
+            'modelcontextprotocol/python-sdk',
         ]
 
         for repo_name in important_repos:

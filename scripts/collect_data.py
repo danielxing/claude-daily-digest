@@ -17,10 +17,22 @@ import logging
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'collectors'))
 
 from collectors import (
+    # Official sources
     collect_anthropic_updates,
+    # GitHub
     collect_github_projects,
-    collect_blog_posts
+    collect_recent_releases,
+    # Blogs
+    collect_blog_posts,
+    # Community discussions
+    collect_hackernews_discussions,
+    collect_hn_claude_code_posts,
+    collect_reddit_posts,
+    collect_reddit_tips_and_tutorials,
+    # Developer tutorials
+    collect_devto_articles,
 )
+from collectors.image_fetcher import enrich_items_with_images, get_image_for_item
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,6 +84,7 @@ def calculate_quality_score(item):
     """
     Calculate quality score for content item
     Higher score = better quality
+    Prioritizes practical content (tutorials, tips, use cases)
     """
     score = 0
 
@@ -79,27 +92,55 @@ def calculate_quality_score(item):
     content = item.get('summary', '') + item.get('description', '')
     content = content.lower()
 
-    # High value keywords
-    high_value = [
+    # High value - Practical content (tutorials, tips, use cases)
+    practical_keywords = [
+        'tutorial', 'guide', 'how to', 'step by step',
+        'tips', 'tricks', 'best practices', 'workflow',
+        'use case', 'example', 'template', 'prompt'
+    ]
+
+    # High value - Claude Code specific
+    claude_code_keywords = [
+        'claude code', 'claude-code', 'mcp', 'model context protocol',
+        'terminal', 'cli', 'vscode', 'agentic', 'agent',
+        'coding assistant', 'code generation'
+    ]
+
+    # High value - Official updates
+    official_keywords = [
         'claude', 'anthropic', 'api', 'update', 'release',
-        'tutorial', 'guide', 'best practices', 'how to',
-        'announcement', 'feature', 'new'
+        'announcement', 'feature', 'new', 'sonnet', 'opus', 'haiku'
     ]
 
-    # Medium value keywords
-    medium_value = [
-        'tips', 'tricks', 'example', 'use case', 'integration',
-        'review', 'comparison', 'analysis'
+    # Medium value - General tech content
+    medium_keywords = [
+        'integration', 'review', 'comparison', 'analysis',
+        'project', 'built with', 'created'
     ]
 
-    # Count keyword matches
-    for keyword in high_value:
+    # Score practical content highest (user priority)
+    for keyword in practical_keywords:
+        if keyword in title:
+            score += 20
+        if keyword in content:
+            score += 8
+
+    # Score Claude Code content high (1:1 ratio with Claude API)
+    for keyword in claude_code_keywords:
+        if keyword in title:
+            score += 18
+        if keyword in content:
+            score += 7
+
+    # Score official keywords
+    for keyword in official_keywords:
         if keyword in title:
             score += 15
         if keyword in content:
             score += 5
 
-    for keyword in medium_value:
+    # Medium value keywords
+    for keyword in medium_keywords:
         if keyword in title:
             score += 10
         if keyword in content:
@@ -109,15 +150,38 @@ def calculate_quality_score(item):
     if item.get('source') in ['Anthropic News', 'Anthropic Docs', 'GitHub Releases']:
         score += 30
 
+    # Bonus for high engagement community content
+    engagement = item.get('engagement', {})
+    if engagement:
+        points = engagement.get('points', 0) or engagement.get('score', 0) or engagement.get('reactions', 0)
+        comments = engagement.get('comments', 0)
+
+        if points > 100:
+            score += 25
+        elif points > 50:
+            score += 15
+        elif points > 20:
+            score += 10
+
+        if comments > 50:
+            score += 15
+        elif comments > 20:
+            score += 10
+
     # Bonus for GitHub stars
-    if 'stars' in item and item['stars'] > 100:
-        score += 20
-    elif 'stars' in item and item['stars'] > 50:
-        score += 10
+    if 'stars' in item:
+        if item['stars'] > 500:
+            score += 25
+        elif item['stars'] > 100:
+            score += 20
+        elif item['stars'] > 50:
+            score += 10
 
     # Length bonus (substance)
     if len(content) > 500:
         score += 10
+    elif len(content) > 200:
+        score += 5
 
     return score
 
@@ -156,17 +220,41 @@ def main():
     db = ContentDatabase(db_path)
 
     # Collect data from all sources
-    logger.info("\n1. Collecting Anthropic updates...")
+    logger.info("\n1. Collecting Anthropic official updates...")
     anthropic_updates = collect_anthropic_updates()
 
     logger.info("\n2. Collecting GitHub projects...")
     github_projects = collect_github_projects()
 
-    logger.info("\n3. Collecting blog posts...")
+    logger.info("\n3. Collecting GitHub releases...")
+    github_releases = collect_recent_releases()
+
+    logger.info("\n4. Collecting blog posts (RSS)...")
     blog_posts = collect_blog_posts()
 
+    logger.info("\n5. Collecting Hacker News discussions...")
+    hn_discussions = collect_hackernews_discussions()
+    hn_claude_code = collect_hn_claude_code_posts()
+
+    logger.info("\n6. Collecting Reddit posts...")
+    reddit_posts = collect_reddit_posts()
+    reddit_tips = collect_reddit_tips_and_tutorials()
+
+    logger.info("\n7. Collecting Dev.to articles...")
+    devto_articles = collect_devto_articles()
+
     # Combine all content
-    all_content = anthropic_updates + github_projects + blog_posts
+    all_content = (
+        anthropic_updates +
+        github_projects +
+        github_releases +
+        blog_posts +
+        hn_discussions +
+        hn_claude_code +
+        reddit_posts +
+        reddit_tips +
+        devto_articles
+    )
 
     logger.info(f"\nTotal items collected: {len(all_content)}")
 
@@ -186,23 +274,57 @@ def main():
 
     logger.info(f"Quality items (score >= 15): {len(quality_content)}")
 
-    # Organize by category
+    # Enrich with images (fetch OG images for better quality)
+    logger.info("\n8. Adding images to content items...")
+    quality_content = enrich_items_with_images(quality_content, fetch_og=True, max_workers=8)
+    logger.info("   Images added (with OG image fetching)")
+
+    # Select featured item (highest quality score)
+    featured_item = quality_content[0] if quality_content else None
+
+    # Get remaining items (excluding featured), limited to 9 for total of 10
+    remaining_items = quality_content[1:10] if len(quality_content) > 1 else []
+
+    # Organize by category (new structure with practical content focus)
     digest_data = {
         'generated_at': datetime.now().isoformat(),
-        'total_items': len(quality_content),
+        'total_items': min(len(quality_content), 10),  # Limit to 10 items
+
+        # Featured item (Editor's Pick)
+        'featured_item': featured_item,
+
+        # All remaining items (for the list view)
+        'items': remaining_items,
+
+        # Category breakdown (for reference)
+        'tutorials_and_tips': [
+            item for item in remaining_items
+            if item.get('category') == 'tutorials_and_tips'
+        ],
+        'use_cases': [
+            item for item in remaining_items
+            if item.get('category') == 'use_cases'
+        ],
+        'claude_code': [
+            item for item in remaining_items
+            if item.get('category') == 'claude_code'
+        ],
         'official_updates': [
-            item for item in quality_content
+            item for item in remaining_items
             if item.get('category') == 'official_updates'
         ],
+        'community_discussions': [
+            item for item in remaining_items
+            if item.get('category') == 'community_discussions'
+        ],
         'github_projects': [
-            item for item in quality_content
+            item for item in remaining_items
             if item.get('category') == 'github_projects'
         ],
         'blog_posts': [
-            item for item in quality_content
+            item for item in remaining_items
             if item.get('category') == 'blog_posts'
         ],
-        'all_items': quality_content[:30]  # Limit to top 30
     }
 
     # Save digest data
@@ -210,9 +332,9 @@ def main():
         json.dump(digest_data, f, indent=2, ensure_ascii=False)
 
     logger.info(f"\nDigest saved to {output_path}")
-    logger.info(f"  - Official updates: {len(digest_data['official_updates'])}")
-    logger.info(f"  - GitHub projects: {len(digest_data['github_projects'])}")
-    logger.info(f"  - Blog posts: {len(digest_data['blog_posts'])}")
+    logger.info(f"  - Total items: {digest_data['total_items']}")
+    logger.info(f"  - Featured: {featured_item['title'][:50] if featured_item else 'None'}...")
+    logger.info(f"  - List items: {len(digest_data['items'])}")
 
     # Cleanup old database entries
     db.cleanup_old_entries(days=30)
