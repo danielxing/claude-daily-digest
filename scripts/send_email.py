@@ -125,7 +125,7 @@ def save_html_preview(html_content):
 
 
 def main():
-    """Main email HTML generation function"""
+    """Main email generation and sending function"""
     logger.info("=" * 60)
     logger.info("Starting email digest generation")
     logger.info("=" * 60)
@@ -141,11 +141,25 @@ def main():
     logger.info("\n2. Rendering email HTML...")
     html_content = render_email_html(digest_data)
 
-    # Save preview (this will be used by GitHub Actions to send email)
+    # Save preview
     save_html_preview(html_content)
 
+    # Check if email credentials are available
+    gmail_user = os.environ.get('GMAIL_USER')
+    gmail_password = os.environ.get('GMAIL_APP_PASSWORD')
+    recipient = os.environ.get('RECIPIENT_EMAIL')
+
+    if all([gmail_user, gmail_password, recipient]):
+        logger.info("\n3. Sending email...")
+        success = send_email(html_content, digest_data)
+        if not success:
+            sys.exit(1)
+    else:
+        logger.info("\n3. Skipping email send (no credentials provided)")
+        logger.info("   Set GMAIL_USER, GMAIL_APP_PASSWORD, RECIPIENT_EMAIL to send")
+
     logger.info("\n" + "=" * 60)
-    logger.info("Email HTML generated successfully!")
+    logger.info("Done!")
     logger.info(f"Total items: {total_items}")
     logger.info("=" * 60)
 

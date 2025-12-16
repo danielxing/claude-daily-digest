@@ -33,6 +33,7 @@ from collectors import (
     collect_devto_articles,
 )
 from collectors.image_fetcher import enrich_items_with_images, get_image_for_item
+from collectors.summary_generator import enrich_items_with_summaries
 
 logging.basicConfig(
     level=logging.INFO,
@@ -278,6 +279,11 @@ def main():
     logger.info("\n8. Adding images to content items...")
     quality_content = enrich_items_with_images(quality_content, fetch_og=True, max_workers=8)
     logger.info("   Images added (with OG image fetching)")
+
+    # Enrich with summaries (extract content and generate Chinese summaries)
+    logger.info("\n9. Generating article summaries...")
+    quality_content = enrich_items_with_summaries(quality_content, max_workers=3)
+    logger.info("   Summaries generated")
 
     # Select featured item (highest quality score)
     featured_item = quality_content[0] if quality_content else None

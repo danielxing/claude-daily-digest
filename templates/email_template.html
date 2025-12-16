@@ -3,507 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Claude Daily Digest - {{ date }}</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background-color: #faf9f7;
-            color: #1a1a1a;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 680px;
-            margin: 0 auto;
-            background: #ffffff;
-        }
-
-        /* Header */
-        .header {
-            padding: 48px 40px 32px;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .logo {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a1a;
-            letter-spacing: -0.5px;
-        }
-
-        .date-badge {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 13px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .header-title {
-            font-size: 42px;
-            font-weight: 400;
-            color: #1a1a1a;
-            line-height: 1.2;
-            letter-spacing: -1px;
-        }
-
-        .header-subtitle {
-            font-size: 18px;
-            color: #666;
-            margin-top: 12px;
-            font-style: italic;
-        }
-
-        /* Featured Section */
-        .featured {
-            padding: 40px;
-            background: linear-gradient(135deg, #fef3e2 0%, #fdf6ec 100%);
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .featured-label {
-            display: inline-block;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #b8860b;
-            background: #fff8e7;
-            padding: 6px 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-
-        .featured-image {
-            width: 100%;
-            height: 320px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 24px;
-            background: #f0f0f0;
-        }
-
-        .featured-source {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .featured-title {
-            font-size: 32px;
-            font-weight: 400;
-            color: #1a1a1a;
-            line-height: 1.3;
-            margin-bottom: 16px;
-            letter-spacing: -0.5px;
-        }
-
-        .featured-title a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .featured-title a:hover {
-            color: #b8860b;
-        }
-
-        .featured-meta {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 16px;
-        }
-
-        .featured-meta span {
-            margin-right: 16px;
-        }
-
-        .featured-summary {
-            font-size: 18px;
-            color: #444;
-            line-height: 1.7;
-        }
-
-        .featured-link {
-            display: inline-block;
-            margin-top: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: #b8860b;
-            text-decoration: none;
-        }
-
-        .featured-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Content List */
-        .content {
-            padding: 0 40px;
-        }
-
-        .section-header {
-            padding: 32px 0 24px;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .section-title {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #1a1a1a;
-        }
-
-        /* Article Item */
-        .article {
-            display: flex;
-            padding: 28px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .article:last-child {
-            border-bottom: none;
-        }
-
-        .article-number {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 28px;
-            font-weight: 300;
-            color: #ccc;
-            width: 48px;
-            flex-shrink: 0;
-            padding-top: 4px;
-        }
-
-        .article-image {
-            width: 140px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-right: 20px;
-            flex-shrink: 0;
-            background: #f5f5f5;
-        }
-
-        .article-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .article-source {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 11px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .article-title {
-            font-size: 20px;
-            font-weight: 400;
-            color: #1a1a1a;
-            line-height: 1.4;
-            margin-bottom: 8px;
-        }
-
-        .article-title a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .article-title a:hover {
-            color: #b8860b;
-        }
-
-        .article-meta {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 12px;
-            color: #999;
-        }
-
-        .article-meta span {
-            margin-right: 12px;
-        }
-
-        .article-meta .engagement {
-            color: #e67e22;
-        }
-
-        .article-summary {
-            font-size: 15px;
-            color: #666;
-            margin-top: 8px;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Category Badge */
-        .category-badge {
-            display: inline-block;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 3px 8px;
-            border-radius: 3px;
-            margin-right: 8px;
-        }
-
-        .category-badge.tutorials { background: #d4edda; color: #155724; }
-        .category-badge.claude-code { background: #e2d5f5; color: #5b21b6; }
-        .category-badge.official { background: #f8d7da; color: #721c24; }
-        .category-badge.community { background: #fff3cd; color: #856404; }
-        .category-badge.github { background: #e2e3e5; color: #383d41; }
-        .category-badge.blog { background: #d1ecf1; color: #0c5460; }
-
-        /* Footer */
-        .footer {
-            padding: 40px;
-            background: #f8f8f8;
-            border-top: 1px solid #e5e5e5;
-            text-align: center;
-        }
-
-        .footer-text {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 16px;
-        }
-
-        .footer-links {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        .footer-links a {
-            font-size: 13px;
-            color: #666;
-            text-decoration: none;
-            margin: 0 12px;
-        }
-
-        .footer-links a:hover {
-            color: #b8860b;
-        }
-
-        /* No Content */
-        .no-content {
-            padding: 60px 40px;
-            text-align: center;
-            color: #888;
-            font-style: italic;
-        }
-
-        /* Mobile */
-        @media (max-width: 600px) {
-            .header {
-                padding: 32px 24px 24px;
-            }
-
-            .header-title {
-                font-size: 32px;
-            }
-
-            .featured {
-                padding: 32px 24px;
-            }
-
-            .featured-image {
-                height: 200px;
-            }
-
-            .featured-title {
-                font-size: 24px;
-            }
-
-            .content {
-                padding: 0 24px;
-            }
-
-            .article {
-                flex-direction: column;
-            }
-
-            .article-number {
-                width: auto;
-                margin-bottom: 12px;
-            }
-
-            .article-image {
-                width: 100%;
-                height: 160px;
-                margin-right: 0;
-                margin-bottom: 16px;
-            }
-
-            .footer {
-                padding: 32px 24px;
-            }
-        }
+    <!--[if mso]>
+    <style type="text/css">
+        table { border-collapse: collapse; }
+        td { font-family: Arial, sans-serif; }
     </style>
+    <![endif]-->
 </head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-top">
-                <div class="logo">Claude Daily Digest</div>
-                <div class="date-badge">{{ date }}</div>
-            </div>
-            <h1 class="header-title">Today's Top Claude & AI Updates</h1>
-            <p class="header-subtitle">{{ total_items }} curated stories from across the Claude ecosystem</p>
-        </div>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Georgia, 'Times New Roman', serif; -webkit-font-smoothing: antialiased;">
+    <!-- Wrapper Table -->
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 20px 10px;">
+                <!-- Main Container -->
+                <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
 
-        {% if featured_item %}
-        <!-- Featured / Editor's Pick -->
-        <div class="featured">
-            <span class="featured-label">Editor's Pick</span>
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 32px 24px 24px; border-bottom: 1px solid #e5e5e5;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 22px; font-weight: 700; color: #1a1a1a;">
+                                        Claude Daily Digest
+                                    </td>
+                                    <td align="right" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 1px;">
+                                        {{ date }}
+                                    </td>
+                                </tr>
+                            </table>
+                            <h1 style="margin: 20px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #1a1a1a; line-height: 1.3;">
+                                Today's Top Claude & AI Updates
+                            </h1>
+                            <p style="margin: 10px 0 0 0; font-size: 16px; color: #666; font-style: italic;">
+                                {{ total_items }} curated stories from across the Claude ecosystem
+                            </p>
+                        </td>
+                    </tr>
 
-            {% if featured_item.image_url %}
-            <img src="{{ featured_item.image_url }}" alt="" class="featured-image" onerror="this.style.display='none'">
-            {% elif featured_item.owner_avatar %}
-            <img src="{{ featured_item.owner_avatar }}" alt="" class="featured-image" onerror="this.style.display='none'">
-            {% endif %}
+                    {% if featured_item %}
+                    <!-- Featured / Editor's Pick - Dark background for dark mode compatibility -->
+                    <tr>
+                        <td style="padding: 28px 24px; background-color: #1a1a1a; border-bottom: 1px solid #333;">
+                            <!-- Editor's Pick Badge -->
+                            <table role="presentation" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #ffd700; background: #333; padding: 6px 12px; border-radius: 4px;">
+                                        ★ Editor's Pick
+                                    </td>
+                                </tr>
+                            </table>
 
-            <div class="featured-source">{{ featured_item.source }}</div>
-
-            <h2 class="featured-title">
-                <a href="{{ featured_item.url }}" target="_blank">{{ featured_item.title }}</a>
-            </h2>
-
-            <div class="featured-meta">
-                {% if featured_item.published %}
-                <span>{{ featured_item.published[:10] if featured_item.published|length > 10 else featured_item.published }}</span>
-                {% endif %}
-                {% if featured_item.engagement %}
-                    {% if featured_item.engagement.points %}
-                    <span style="color: #e67e22;">{{ featured_item.engagement.points }} points</span>
-                    {% endif %}
-                    {% if featured_item.engagement.comments %}
-                    <span>{{ featured_item.engagement.comments }} comments</span>
-                    {% endif %}
-                {% endif %}
-                {% if featured_item.stars %}
-                <span style="color: #f59e0b;">{{ featured_item.stars }} stars</span>
-                {% endif %}
-            </div>
-
-            {% if featured_item.summary %}
-            <p class="featured-summary">{{ featured_item.summary }}</p>
-            {% elif featured_item.description %}
-            <p class="featured-summary">{{ featured_item.description }}</p>
-            {% endif %}
-
-            <a href="{{ featured_item.url }}" class="featured-link" target="_blank">Read full article &rarr;</a>
-        </div>
-        {% endif %}
-
-        <!-- Content List -->
-        <div class="content">
-            {% if items %}
-            <div class="section-header">
-                <div class="section-title">More Stories</div>
-            </div>
-
-            {% for item in items %}
-            <div class="article">
-                <div class="article-number">{{ '%02d' % loop.index }}</div>
-
-                {% if item.image_url or item.owner_avatar %}
-                <img src="{{ item.image_url or item.owner_avatar }}" alt="" class="article-image" onerror="this.style.display='none'">
-                {% endif %}
-
-                <div class="article-content">
-                    <div class="article-source">
-                        {% if item.category == 'tutorials_and_tips' %}
-                        <span class="category-badge tutorials">Tutorial</span>
-                        {% elif item.category == 'claude_code' %}
-                        <span class="category-badge claude-code">Claude Code</span>
-                        {% elif item.category == 'official_updates' %}
-                        <span class="category-badge official">Official</span>
-                        {% elif item.category == 'community_discussions' %}
-                        <span class="category-badge community">Discussion</span>
-                        {% elif item.category == 'github_projects' %}
-                        <span class="category-badge github">GitHub</span>
-                        {% elif item.category == 'blog_posts' %}
-                        <span class="category-badge blog">Blog</span>
-                        {% endif %}
-                        {{ item.source }}
-                    </div>
-
-                    <h3 class="article-title">
-                        <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
-                    </h3>
-
-                    <div class="article-meta">
-                        {% if item.published %}
-                        <span>{{ item.published[:10] if item.published|length > 10 else item.published }}</span>
-                        {% endif %}
-                        {% if item.engagement %}
-                            {% if item.engagement.points %}
-                            <span class="engagement">{{ item.engagement.points }} pts</span>
+                            {% if featured_item.image_url %}
+                            <!-- Featured Image -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 16px;">
+                                <tr>
+                                    <td>
+                                        <img src="{{ featured_item.image_url }}" alt="" width="552" style="width: 100%; max-width: 552px; height: auto; border-radius: 8px; display: block;">
+                                    </td>
+                                </tr>
+                            </table>
+                            {% elif featured_item.owner_avatar %}
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 16px;">
+                                <tr>
+                                    <td>
+                                        <img src="{{ featured_item.owner_avatar }}" alt="" width="552" style="width: 100%; max-width: 552px; height: auto; border-radius: 8px; display: block;">
+                                    </td>
+                                </tr>
+                            </table>
                             {% endif %}
-                            {% if item.engagement.comments %}
-                            <span>{{ item.engagement.comments }} comments</span>
-                            {% endif %}
-                        {% endif %}
-                        {% if item.stars %}
-                        <span style="color: #f59e0b;">{{ item.stars }} stars</span>
-                        {% endif %}
-                    </div>
 
-                    {% if item.summary %}
-                    <p class="article-summary">{{ item.summary }}</p>
-                    {% elif item.description %}
-                    <p class="article-summary">{{ item.description }}</p>
+                            <!-- Featured Content -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 20px;">
+                                <tr>
+                                    <td>
+                                        <p style="margin: 0 0 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">
+                                            {{ featured_item.source }}
+                                        </p>
+                                        <h2 style="margin: 0 0 12px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 600; line-height: 1.3;">
+                                            <a href="{{ featured_item.url }}" target="_blank" style="color: #ffffff; text-decoration: underline;">{{ featured_item.title }}</a>
+                                        </h2>
+                                        <p style="margin: 0 0 12px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #999;">
+                                            {% if featured_item.published %}
+                                            <span>{{ featured_item.published[:10] if featured_item.published|length > 10 else featured_item.published }}</span>
+                                            {% endif %}
+                                            {% if featured_item.engagement %}
+                                                {% if featured_item.engagement.points %}
+                                                &nbsp;&nbsp;<span style="color: #ffa500;">{{ featured_item.engagement.points }} points</span>
+                                                {% endif %}
+                                                {% if featured_item.engagement.comments %}
+                                                &nbsp;&nbsp;<span>{{ featured_item.engagement.comments }} comments</span>
+                                                {% endif %}
+                                            {% endif %}
+                                            {% if featured_item.stars %}
+                                            &nbsp;&nbsp;<span style="color: #ffd700;">★ {{ featured_item.stars }}</span>
+                                            {% endif %}
+                                        </p>
+                                        {% if featured_item.summary %}
+                                        <p style="margin: 0 0 16px 0; font-size: 16px; color: #ccc; line-height: 1.6;">
+                                            {{ featured_item.summary }}
+                                        </p>
+                                        {% elif featured_item.description %}
+                                        <p style="margin: 0 0 16px 0; font-size: 16px; color: #ccc; line-height: 1.6;">
+                                            {{ featured_item.description }}
+                                        </p>
+                                        {% endif %}
+                                        <a href="{{ featured_item.url }}" target="_blank" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: 600; color: #ffd700; text-decoration: none;">
+                                            Read full article →
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
                     {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-            {% endif %}
 
-            {% if not featured_item and not items %}
-            <div class="no-content">
-                <p>No new content today. Check back tomorrow!</p>
-            </div>
-            {% endif %}
-        </div>
+                    {% if items %}
+                    <!-- Section Header -->
+                    <tr>
+                        <td style="padding: 24px 24px 16px;">
+                            <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1a1a1a; border-bottom: 2px solid #1a1a1a; padding-bottom: 12px;">
+                                More Stories
+                            </p>
+                        </td>
+                    </tr>
 
-        <!-- Footer -->
-        <div class="footer">
-            <p class="footer-text">Curated daily from Hacker News, Dev.to, GitHub, and official Anthropic sources</p>
-            <div class="footer-links">
-                <a href="https://github.com/anthropics/claude-code">Claude Code</a>
-                <a href="https://www.anthropic.com">Anthropic</a>
-                <a href="https://docs.anthropic.com">Documentation</a>
-            </div>
-        </div>
-    </div>
+                    <!-- Article List -->
+                    {% for item in items %}
+                    <tr>
+                        <td style="padding: 0 24px 24px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-bottom: 1px solid #f0f0f0; padding-bottom: 20px;">
+                                <tr>
+                                    <!-- Number -->
+                                    <td width="40" valign="top" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 24px; font-weight: 300; color: #ccc; padding-right: 12px;">
+                                        {{ '%02d' % loop.index }}
+                                    </td>
+                                    <!-- Content -->
+                                    <td valign="top">
+                                        <!-- Category + Source -->
+                                        <p style="margin: 0 0 6px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            {% if item.category == 'tutorials_and_tips' %}
+                                            <span style="display: inline-block; background: #d4edda; color: #155724; padding: 2px 6px; border-radius: 3px; font-weight: 600; margin-right: 6px;">Tutorial</span>
+                                            {% elif item.category == 'claude_code' %}
+                                            <span style="display: inline-block; background: #e2d5f5; color: #5b21b6; padding: 2px 6px; border-radius: 3px; font-weight: 600; margin-right: 6px;">Claude Code</span>
+                                            {% elif item.category == 'official_updates' %}
+                                            <span style="display: inline-block; background: #f8d7da; color: #721c24; padding: 2px 6px; border-radius: 3px; font-weight: 600; margin-right: 6px;">Official</span>
+                                            {% elif item.category == 'community_discussions' %}
+                                            <span style="display: inline-block; background: #fff3cd; color: #856404; padding: 2px 6px; border-radius: 3px; font-weight: 600; margin-right: 6px;">Discussion</span>
+                                            {% elif item.category == 'github_projects' %}
+                                            <span style="display: inline-block; background: #e2e3e5; color: #383d41; padding: 2px 6px; border-radius: 3px; font-weight: 600; margin-right: 6px;">GitHub</span>
+                                            {% elif item.category == 'blog_posts' %}
+                                            <span style="display: inline-block; background: #d1ecf1; color: #0c5460; padding: 2px 6px; border-radius: 3px; font-weight: 600; margin-right: 6px;">Blog</span>
+                                            {% endif %}
+                                            <span style="color: #888;">{{ item.source }}</span>
+                                        </p>
+                                        <!-- Title -->
+                                        <h3 style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 600; line-height: 1.4; color: #000000;">
+                                            <a href="{{ item.url }}" target="_blank" style="color: #000000; text-decoration: underline;">{{ item.title }}</a>
+                                        </h3>
+                                        <!-- Meta -->
+                                        <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #999;">
+                                            {% if item.published %}
+                                            <span>{{ item.published[:10] if item.published|length > 10 else item.published }}</span>
+                                            {% endif %}
+                                            {% if item.engagement %}
+                                                {% if item.engagement.points %}
+                                                &nbsp;&nbsp;<span style="color: #e67e22;">{{ item.engagement.points }} pts</span>
+                                                {% endif %}
+                                                {% if item.engagement.comments %}
+                                                &nbsp;&nbsp;<span>{{ item.engagement.comments }} comments</span>
+                                                {% endif %}
+                                            {% endif %}
+                                            {% if item.stars %}
+                                            &nbsp;&nbsp;<span style="color: #f59e0b;">★ {{ item.stars }}</span>
+                                            {% endif %}
+                                        </p>
+                                        {% if item.summary %}
+                                        <p style="margin: 8px 0 0 0; font-size: 14px; color: #666; line-height: 1.6;">
+                                            {{ item.summary }}
+                                        </p>
+                                        {% elif item.description %}
+                                        <p style="margin: 8px 0 0 0; font-size: 14px; color: #666; line-height: 1.6;">
+                                            {{ item.description[:300] }}{% if item.description|length > 300 %}...{% endif %}
+                                        </p>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if not featured_item and not items %}
+                    <!-- No Content -->
+                    <tr>
+                        <td style="padding: 60px 24px; text-align: center; color: #888; font-style: italic;">
+                            No new content today. Check back tomorrow!
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px 24px; background: #f8f8f8; border-top: 1px solid #e5e5e5; text-align: center;">
+                            <p style="margin: 0 0 12px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #888;">
+                                Curated daily from Hacker News, Reddit, Dev.to, GitHub, and Anthropic
+                            </p>
+                            <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px;">
+                                <a href="https://github.com/anthropics/claude-code" style="color: #666; text-decoration: none; margin: 0 8px;">Claude Code</a>
+                                <a href="https://www.anthropic.com" style="color: #666; text-decoration: none; margin: 0 8px;">Anthropic</a>
+                                <a href="https://docs.anthropic.com" style="color: #666; text-decoration: none; margin: 0 8px;">Docs</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+                <!-- End Main Container -->
+            </td>
+        </tr>
+    </table>
+    <!-- End Wrapper -->
 </body>
 </html>
