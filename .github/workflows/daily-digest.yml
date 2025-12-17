@@ -80,7 +80,6 @@ jobs:
           to: ${{ secrets.EMAIL_TO }}
           from: "Claude Digest Bot <${{ secrets.EMAIL_USERNAME }}>"
           html_body: file://data/email_preview.html
-          content_type: text/html
 
       - name: Commit and push database updates
         run: |
